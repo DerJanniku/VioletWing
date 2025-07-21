@@ -84,8 +84,10 @@ def create_bounding_box_section(main_window, parent):
     settings_list = [
         ("Enable Bounding Box", "checkbox", "enable_box", "Toggle visibility of enemy bounding boxes"),
         ("Enable Skeleton ESP", "checkbox", "enable_skeleton", "Toggle visibility of player skeletons"),
+        ("Enable Glow", "checkbox", "enable_glow", "Toggle visibility of player glow effect"),
         ("Line Thickness", "slider", "box_line_thickness", "Adjust thickness of bounding box lines (0.5-5.0)"),
         ("Box Color", "combo", "box_color_hex", "Select color for bounding boxes"),
+        ("Glow Color", "combo", "glow_color_hex", "Select color for the glow effect"),
         ("Target FPS", "slider", "target_fps", "Adjust target FPS for overlay rendering (60-420)")
     ]
 

@@ -34,6 +34,8 @@ class MemoryManager:
         self.m_flFlashDuration = None
         self.m_pBoneArray = None
         self.dwForceJump = None
+        self.m_clrGlow = None
+        self.m_bIsGlowing = None
 
     def initialize(self) -> bool:
         """
@@ -102,6 +104,8 @@ class MemoryManager:
             self.m_hPlayerPawn = extracted["m_hPlayerPawn"]
             self.m_flFlashDuration = extracted["m_flFlashDuration"]
             self.m_pBoneArray = extracted["m_pBoneArray"]
+            self.m_clrGlow = extracted.get("m_clrGlow")
+            self.m_bIsGlowing = extracted.get("m_bIsGlowing")
         else:
             logger.error("Failed to initialize offsets from extracted data.")
 
@@ -161,6 +165,25 @@ class MemoryManager:
             logger.debug(f"Wrote int {value} to address {hex(address)}")
         except Exception as e:
             logger.error(f"Failed to write int at address {hex(address)}: {e}")
+            raise
+
+    def write_bool(self, address: int, value: bool) -> None:
+        """Write a boolean to memory."""
+        try:
+            self.pm.write_bool(address, value)
+            logger.debug(f"Wrote bool {value} to address {hex(address)}")
+        except Exception as e:
+            logger.error(f"Failed to write bool at address {hex(address)}: {e}")
+            raise
+
+    def write_color4(self, address: int, color: tuple) -> None:
+        """Write a color (RGBA) to memory."""
+        try:
+            data = struct.pack('BBBB', int(color[0]), int(color[1]), int(color[2]), int(color[3]))
+            self.pm.write_bytes(address, data, len(data))
+            logger.debug(f"Wrote color {color} to address {hex(address)}")
+        except Exception as e:
+            logger.error(f"Failed to write color at address {hex(address)}: {e}")
             raise
 
     def read_vec3(self, address: int) -> dict | None:

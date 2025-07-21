@@ -167,6 +167,8 @@ class CS2Overlay:
         settings = self.config['Overlay']
         self.enable_box = settings['enable_box']
         self.enable_skeleton = settings.get('enable_skeleton', True)
+        self.enable_glow = settings.get('enable_glow', False)
+        self.glow_color_hex = settings.get('glow_color_hex', '#FF0000')
         self.draw_snaplines = settings['draw_snaplines']
         self.snaplines_color_hex = settings['snaplines_color_hex']
         self.box_line_thickness = settings['box_line_thickness']
@@ -291,7 +293,10 @@ class CS2Overlay:
             except Exception:
                 pos2d, head_pos2d = None, None
 
-            if not isinstance(pos2d, dict) or not isinstance(head_pos2d, dict) or not entity.validate_screen_position(pos2d) or not entity.validate_screen_position(head_pos2d):
+            if not isinstance(pos2d, dict) or not isinstance(head_pos2d, dict):
+                return
+
+            if not entity.validate_screen_position(pos2d) or not entity.validate_screen_position(head_pos2d):
                 return
 
             entity.pos2d = pos2d
@@ -308,6 +313,14 @@ class CS2Overlay:
 
             if self.enable_skeleton and all_bones_pos_3d:
                 self.draw_skeleton(entity, view_matrix, outline_color, all_bones_pos_3d)
+
+            if self.enable_glow and self.memory_manager.m_clrGlow is not None and self.memory_manager.m_bIsGlowing is not None:
+                try:
+                    glow_color = overlay.get_color(self.glow_color_hex)
+                    self.memory_manager.write_color4(entity.pawn_ptr + self.memory_manager.m_clrGlow, glow_color)
+                    self.memory_manager.write_bool(entity.pawn_ptr + self.memory_manager.m_bIsGlowing, True)
+                except Exception as e:
+                    logger.error(f"Failed to apply glow effect: {e}")
 
             if self.draw_snaplines:
                 screen_width = overlay.get_screen_width()
